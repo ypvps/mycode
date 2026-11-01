@@ -1,0 +1,13 @@
+{
+  "name": "openai-app-relay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A small OpenAI-compatible API relay for apps",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test"
+  }
+}
