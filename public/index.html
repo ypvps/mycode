@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <meta name="description" content="OpenAI-compatible API 中转管理控制台">
+  <title>RelayDesk · API 中转控制台</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="RelayDesk 首页">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 10.5 16 5l9 5.5v11L16 27l-9-5.5z"/><path d="M11 16h10M16 11v10"/></svg></span>
+        <span class="brand-copy"><strong>RelayDesk</strong><small>MODEL GATEWAY</small></span>
+      </a>
+      <div class="workspace-label">工作空间</div>
+      <nav class="side-nav" aria-label="主导航">
+        <button class="nav-item active" data-page="overview"><span class="nav-icon">◫</span><span>总览</span></button>
+        <button class="nav-item" data-page="api"><span class="nav-icon">⌘</span><span>接口与模型</span></button>
+        <button class="nav-item" data-page="requests"><span class="nav-icon">≋</span><span>请求记录</span></button>
+        <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span><span>系统设置</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="secure-note"><span class="secure-icon">✓</span><div><strong>密钥安全</strong><small>仅在服务端保存上游凭证</small></div></div>
+        <div class="sidebar-foot"><span class="foot-dot"></span>Relay 服务 <span id="side-status">连接中</span></div>
+        <div class="version">RELAYDESK <span>·</span> SELF-HOSTED</div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="breadcrumb"><span>工作空间</span><span class="crumb-sep">/</span><strong id="crumb-title">总览</strong></div>
+        <div class="top-actions">
+          <span class="top-live"><i></i><span id="top-status">正在连接</span></span>
+          <button class="icon-button" id="refresh-button" aria-label="刷新状态" title="刷新状态">↻</button>
+          <button class="user-button" id="login-open"><span class="avatar">R</span><span class="user-label"><strong id="user-state">访客模式</strong><small id="user-subtitle">管理员登录</small></span><span class="chevron">⌄</span></button>
+          <button class="button button-quiet hidden" id="logout-button">退出登录</button>
+        </div>
+      </header>
+
+      <div class="page-wrap">
+        <section class="page active" id="page-overview">
+          <div class="welcome-row">
+            <div><div class="eyebrow"><span class="eyebrow-dot"></span>API GATEWAY <span class="eyebrow-line"></span> 控制台</div><h1>早上好，欢迎回来<span class="wave">✳</span></h1><p class="subhead">在一个地方掌握模型接口、服务状态与调用情况。</p></div>
+            <div class="date-chip"><span class="calendar-icon">▦</span><span id="today-label">服务运行中</span></div>
+          </div>
+
+          <div class="notice" id="setup-notice">
+            <span class="notice-icon">!</span><div class="notice-copy"><strong id="notice-title">完成初始化，开始使用中转服务</strong><span id="notice-text">配置上游 API 凭证与管理员密码后，即可从控制台管理服务。</span></div><button class="notice-action" data-go="settings">查看配置 <span>→</span></button>
+          </div>
+
+          <div class="stat-grid">
+            <article class="stat-card"><div class="stat-top"><span>服务状态</span><span class="stat-symbol green">⌁</span></div><div class="stat-value" id="stat-health">检查中</div><div class="stat-foot"><span class="status-pill" id="health-pill"><i></i>正在检测</span><span class="stat-caption">API relay</span></div></article>
+            <article class="stat-card"><div class="stat-top"><span>累计请求</span><span class="stat-symbol blue">↗</span></div><div class="stat-value" id="stat-requests">—</div><div class="stat-foot"><span class="stat-caption">自本次启动以来</span></div></article>
+            <article class="stat-card"><div class="stat-top"><span>异常请求</span><span class="stat-symbol coral">!</span></div><div class="stat-value" id="stat-errors">—</div><div class="stat-foot"><span class="stat-caption">上游或鉴权错误</span></div></article>
+            <article class="stat-card"><div class="stat-top"><span>运行时间</span><span class="stat-symbol violet">◷</span></div><div class="stat-value" id="stat-uptime">—</div><div class="stat-foot"><span class="stat-caption">当前进程持续时间</span></div></article>
+          </div>
+
+          <div class="content-grid">
+            <section class="panel endpoint-panel">
+              <div class="panel-heading"><div><div class="section-kicker">QUICK START</div><h2>快速接入</h2><p>将以下地址填入支持 OpenAI 兼容接口的 App。</p></div><span class="panel-icon">⌘</span></div>
+              <div class="endpoint-box"><div class="endpoint-meta"><span class="endpoint-method">BASE URL</span><span class="endpoint-hint">OpenAI Compatible</span></div><div class="endpoint-value"><code id="base-url">当前预览地址 /v1</code><button class="copy-button" data-copy="base-url" aria-label="复制接口地址" title="复制">▢</button></div></div>
+              <div class="quick-details"><div><span class="detail-label">API Key</span><span class="detail-value" id="key-hint">使用你的中转密钥</span></div><div><span class="detail-label">聊天接口</span><code>/chat/completions</code></div><div><span class="detail-label">流式响应</span><span class="feature-supported"><i></i>已支持 SSE</span></div></div>
+              <div class="panel-divider"></div>
+              <div class="code-heading"><span>测试接口连通性</span><span class="code-lang">CURL</span></div>
+              <div class="code-block"><code><span class="code-purple">curl</span> <span id="curl-url">https://你的域名/v1/models</span> \
+  -H <span class="code-green">'Authorization: Bearer 你的中转密钥'</span></code><button class="copy-button copy-curl" data-copy="curl-command" aria-label="复制测试命令" title="复制">▢</button><span id="curl-command" class="sr-only">curl https://你的域名/v1/models -H 'Authorization: Bearer 你的中转密钥'</span></div>
+              <div class="panel-bottom"><span><i class="info-dot">i</i> 请勿将上游 API Key 放入客户端</span><button class="text-button" data-go="api">管理接口 <span>→</span></button></div>
+            </section>
+
+            <section class="panel activity-panel">
+              <div class="panel-heading activity-heading"><div><div class="section-kicker">LIVE ACTIVITY</div><h2>最近请求</h2><p>仅记录路径、状态码和耗时，不记录请求内容。</p></div><button class="small-link" data-go="requests">全部记录 <span>→</span></button></div>
+              <div class="activity-list" id="recent-requests"><div class="empty-state"><span class="empty-icon">⌁</span><strong>暂无请求记录</strong><span>API 被调用后，活动会显示在这里。</span></div></div>
+              <div class="activity-footer"><span class="live-pulse"><i></i>实时状态</span><span id="uptime-inline">服务启动后开始统计</span></div>
+            </section>
+          </div>
+
+          <div class="bottom-grid">
+            <section class="panel model-panel"><div class="panel-heading compact"><div><div class="section-kicker">MODEL ACCESS</div><h2>模型访问</h2></div><button class="small-link" data-go="api">配置模型 <span>→</span></button></div><div class="model-content" id="model-summary"><div class="model-orb">✳</div><div><strong>模型白名单未设置</strong><span>当前可透传上游账号允许的模型。</span></div></div></section>
+            <section class="panel secure-panel"><div class="secure-graphic"><span class="shield">✓</span><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span></div><div><div class="section-kicker">BUILT FOR SAFETY</div><h2>密钥留在服务端</h2><p>客户端只使用中转密钥。上游凭证不会返回到浏览器。</p><button class="text-button" data-go="settings">安全设置 <span>→</span></button></div></section>
+          </div>
+          <footer class="page-footer"><span>RelayDesk <span class="footer-dot">·</span> 自托管模型中转服务</span><span>安全优先 · 简洁可控</span></footer>
+        </section>
+
+        <section class="page" id="page-api">
+          <div class="page-title-row"><div><div class="eyebrow">API CONFIGURATION</div><h1>接口与模型</h1><p class="subhead">配置上游兼容接口，并控制允许访问的模型。</p></div><button class="button button-primary" id="test-upstream">▷ <span>测试上游连接</span></button></div>
+          <div class="panel form-panel"><div class="form-section-title"><span class="form-icon">↗</span><div><h2>上游服务商</h2><p>请求将由服务端转发到此地址。</p></div></div>
+            <label class="field-label" for="upstream-url">上游 API Base URL</label><input class="text-input" id="upstream-url" placeholder="https://api.openai.com/v1" autocomplete="url"><div class="field-help">例如 https://api.openai.com/v1。请填写 API 根地址，勿附带密钥。</div>
+            <div class="field-label-row"><label class="field-label" for="upstream-key">上游 API Key</label><span class="field-state" id="upstream-key-state">未配置</span></div><div class="input-with-action"><input class="text-input" id="upstream-key" type="password" placeholder="粘贴服务商 API Key；留空则保持不变" autocomplete="new-password"><button class="input-action" data-toggle="upstream-key">显示</button></div><div class="field-help">密钥只会保存在服务器的数据目录中，并且不会再次显示。</div>
+            <div class="form-divider"></div>
+            <div class="form-section-title"><span class="form-icon violet-bg">✳</span><div><h2>模型白名单</h2><p>留空表示不额外限制，由上游账号权限决定。</p></div></div>
+            <label class="field-label" for="model-list">允许的模型</label><input class="text-input" id="model-list" placeholder="gpt-4o-mini, gpt-4.1-mini"><div class="field-help">多个模型用逗号分隔；请求未列出的模型将被拒绝。</div>
+            <div class="form-actions"><span class="save-hint" id="settings-save-hint">更改仅对中转服务生效</span><button class="button button-primary" id="save-settings">保存配置</button></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-requests">
+          <div class="page-title-row"><div><div class="eyebrow">REQUEST LOGS</div><h1>请求记录</h1><p class="subhead">查看服务运行期间的 API 请求摘要，不包含提示词或密钥。</p></div><button class="button button-secondary" id="refresh-logs">↻ 刷新记录</button></div>
+          <div class="panel table-panel"><div class="table-toolbar"><div><strong>最近调用</strong><span id="log-count">0 条记录</span></div><span class="privacy-tag"><i></i>不存储请求正文</span></div><div class="table-wrap"><table><thead><tr><th>状态</th><th>接口</th><th>方法</th><th>耗时</th><th>时间</th></tr></thead><tbody id="logs-body"><tr><td colspan="5" class="table-empty">登录后查看请求记录</td></tr></tbody></table></div><div class="table-note">请求记录保存在内存中，服务重启后清空；未记录 IP、请求体或认证信息。</div></div>
+        </section>
+
+        <section class="page" id="page-settings">
+          <div class="page-title-row"><div><div class="eyebrow">SYSTEM PREFERENCES</div><h1>系统设置</h1><p class="subhead">管理中转访问密钥、请求限制与浏览器跨域策略。</p></div></div>
+          <div class="settings-columns"><div class="panel form-panel settings-main"><div class="form-section-title"><span class="form-icon">⚿</span><div><h2>中转访问密钥</h2><p>App 通过此密钥鉴权；建议定期轮换。</p></div></div><div class="field-label-row"><label class="field-label" for="relay-key">Relay API Key</label><span class="field-state" id="relay-key-state">未配置</span></div><div class="input-with-action"><input class="text-input" id="relay-key" type="password" placeholder="设置一个足够长的随机密钥" autocomplete="new-password"><button class="input-action" data-toggle="relay-key">显示</button></div><div class="field-help">已保存的密钥不会显示。留空代表保持现有密钥。</div><div class="form-divider"></div>
+            <div class="form-section-title"><span class="form-icon blue-bg">⌁</span><div><h2>请求与网络</h2><p>控制请求体大小和上游等待时间。</p></div></div><div class="two-fields"><div><label class="field-label" for="body-limit">请求体上限（MiB）</label><input class="text-input" id="body-limit" type="number" min="0.001" max="100" step="1"></div><div><label class="field-label" for="timeout-seconds">上游超时（秒）</label><input class="text-input" id="timeout-seconds" type="number" min="1" max="900" step="1"></div></div><div class="field-label-row origin-label"><label class="field-label" for="allowed-origins">允许的网页来源</label><span class="optional-label">可选</span></div><input class="text-input" id="allowed-origins" placeholder="https://app.example.com, https://admin.example.com"><div class="field-help">原生 App 通常无需填写。仅列出可信的 HTTPS 网页域名；避免使用 *。</div><div class="form-actions"><span class="save-hint" id="system-save-hint">设置加密传输前请先启用 HTTPS</span><button class="button button-primary" id="save-system">保存设置</button></div>
+          </div><aside class="settings-aside"><div class="panel info-panel"><div class="info-panel-icon">♧</div><h2>部署状态</h2><div class="status-line"><span>管理后台口令</span><strong id="admin-password-state">检测中</strong></div><div class="status-line"><span>上游凭证</span><strong id="upstream-config-state">检测中</strong></div><div class="status-line"><span>中转密钥</span><strong id="relay-config-state">检测中</strong></div><div class="info-separator"></div><p>管理员密码通过环境变量 <code>ADMIN_PASSWORD</code> 设置。请勿将管理控制台直接暴露在无 HTTPS 的公网中。</p></div><div class="tip-card"><span>✦</span><div><strong>配置优先级</strong><p>管理页面保存的配置持久化在服务器 <code>data/settings.json</code>，重启后仍生效。妥善保护数据目录。</p></div></div></aside></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="login-modal" aria-hidden="true"><section class="login-card" role="dialog" aria-modal="true" aria-labelledby="login-title"><button class="modal-close" id="login-close" aria-label="关闭">×</button><div class="login-brand"><span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 10.5 16 5l9 5.5v11L16 27l-9-5.5z"/><path d="M11 16h10M16 11v10"/></svg></span></div><div class="section-kicker">ADMIN CONSOLE</div><h2 id="login-title">管理员登录</h2><p>登录以管理接口配置、访问密钥和请求记录。</p><form id="login-form"><label class="field-label" for="admin-password">管理员密码</label><input class="text-input" id="admin-password" type="password" placeholder="输入服务端配置的管理员密码" autocomplete="current-password" required><div class="login-error" id="login-error" role="alert"></div><button class="button button-primary login-submit" type="submit">安全登录 <span>→</span></button></form><div class="login-foot"><span class="lock-small">▣</span> 使用安全连接管理自托管服务</div></section></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

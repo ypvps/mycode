@@ -1,0 +1,17 @@
+services:
+  relay:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+      DATA_DIR: /app/data
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - relay-data:/app/data
+
+volumes:
+  relay-data:
